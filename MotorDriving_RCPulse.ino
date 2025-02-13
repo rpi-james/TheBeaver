@@ -1,5 +1,4 @@
 #include <IBusBM.h>
-//#include "RoboClaw.h"
 #include <ESP32Servo.h>
 
 // Flysky IBus Receiver on RX2
@@ -11,7 +10,7 @@
 #define MotorB 4
 
 // Defines for Motor Throttle and Steering Calculations
-#define DEADZONE 100 // Where the robot will not be moving or steering from center
+#define DEADZONE 200 // Where the robot will not be moving or steering from center
 #define CENTER 1500 //Center value of controller and Servo.write
 #define RANGE 400 // Range of values possible after deadzone
 
@@ -36,56 +35,47 @@ void loop() {
         int throttle = ibus.readChannel(1);  // Channel 2 (Throttle)
         int steer = ibus.readChannel(3)-CENTER;  // Channel 4 (Steering)
 
-        // Convert iBus range (1000-2000) to RoboClaw motor range (-127 to +127)
-        //int motorSpeed = map(throttle, 1000, 2000, 0, 180);
-        //int turn = map(steering, 1000, 2000, 0, 180);
+        // Convert iBus range (1000-2000) to RoboClaw motor range (500 to 2500)
+        int motorSpeed = map(throttle, 1000, 2000, 500, 2500);
+        int turn = map(steer, -500, 500, -1000, 1000);
 
         // Calculate motor values
         int leftMotor=CENTER,rightMotor=CENTER;
         //If the thro
-        if(throttle<=(CENTER+DEADZONE) && throttle>=(CENTER-DEADZONE)){
+        if(motorSpeed<=(CENTER+DEADZONE) && motorSpeed>=(CENTER-DEADZONE)){
           leftMotor  = CENTER;
           rightMotor = CENTER;
         }
-        else if(throttle>(CENTER) && steer<(-DEADZONE)){ //Forward Left Turn
-          leftMotor  = CENTER + steer;
-          rightMotor = CENTER - steer;
+        else if(motorSpeed>(CENTER) && turn<(-DEADZONE)){ //Forward Left Turn
+          leftMotor  = CENTER + turn;
+          rightMotor = CENTER - turn;
         }
-        else if(throttle>(CENTER) && steer>(DEADZONE)){ //Forward Right Turn
-          leftMotor  = CENTER + steer;
-          rightMotor = CENTER - steer;
+        else if(motorSpeed>(CENTER) && turn>(DEADZONE)){ //Forward Right Turn
+          leftMotor  = CENTER + turn;
+          rightMotor = CENTER - turn;
         }
-        else if(throttle<(CENTER) && steer<(-DEADZONE)){ //Reverse Left Turn
-          leftMotor  = CENTER - steer;
-          rightMotor = CENTER + steer;
+        else if(motorSpeed<(CENTER) && turn<(-DEADZONE)){ //Reverse Left Turn
+          leftMotor  = CENTER - turn;
+          rightMotor = CENTER + turn;
         }
-        else if(throttle<(CENTER) && steer>(DEADZONE)){ //Forward Right Turn
-          leftMotor  = CENTER - steer;
-          rightMotor = CENTER + steer;
+        else if(motorSpeed<(CENTER) && turn>(DEADZONE)){ //Forward Right Turn
+          leftMotor  = CENTER - turn;
+          rightMotor = CENTER + turn;
         }
-        else if(throttle>CENTER || throttle<CENTER && steer>(-DEADZONE) && steer<DEADZONE){ // Forward  and Reverse Straight
-          leftMotor  = throttle;
-          rightMotor = throttle;
+        else if(motorSpeed>CENTER || motorSpeed<CENTER && turn>(-DEADZONE) && turn<DEADZONE){ // Forward  and Reverse Straight
+          leftMotor  = motorSpeed;
+          rightMotor = motorSpeed;
         }
 
         //Drive the motors using the servo objects
         ServoA.writeMicroseconds(leftMotor);
         ServoB.writeMicroseconds(rightMotor);
-/*  
-        // Send commands to RoboClaw
-        if (leftMotor >= 0)
-            roboclaw.ForwardM1(ROBOCLAW_ADDRESS, leftMotor);
-        else
-            roboclaw.BackwardM1(ROBOCLAW_ADDRESS, -leftMotor);
-
-        if (rightMotor >= 0)
-            roboclaw.ForwardM2(ROBOCLAW_ADDRESS, rightMotor);
-        else
-            roboclaw.BackwardM2(ROBOCLAW_ADDRESS, -rightMotor);
 */
         // Debug Output
         Serial.print("Throttle: "); Serial.print(throttle);
         Serial.print(" | Steering: "); Serial.print(steer);
+        Serial.print(" | Motor Speed: "); Serial.print(motorSpeed);
+        Serial.print(" | Turn: "); Serial.print(turn);
         Serial.print(" | Left Motor: "); Serial.print(leftMotor);
         Serial.print(" | Right Motor: "); Serial.println(rightMotor);
         delay(50);
