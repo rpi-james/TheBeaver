@@ -6,19 +6,23 @@
 #define IBUS_TX_PIN 17
 
 // Motor Pins on ESP32
-#define MotorA 2
-#define MotorB 4
+#define RFMotor 2
+#define LFMotor 4
+#define RRMotor 23
+#define LRMotor 25
+
 
 // Defines for Motor Throttle and Steering Calculations
 #define DEADZONE 200 // Where the robot will not be moving or steering from center
 #define CENTER 1500 //Center value of controller and Servo.write
-#define RANGE 400 // Range of values possible after deadzone
 
 
 // Create Serial instances
 IBusBM ibus; //IBus object
-Servo ServoA;
-Servo ServoB;
+Servo RFServo;
+Servo LFServo;
+Servo RRServo;
+Servo LRServo;
 
 void setup() {
     Serial.begin(115200);
@@ -26,14 +30,20 @@ void setup() {
 
     ibus.begin(Serial2, 1);  // iBUS object connected to serial2 RX2 pin using timer 1
     
-    ServoA.attach(MotorA);
-    ServoB.attach(MotorB);
+    RFServo.attach(RFMotor);
+    LFServo.attach(LFMotor);
+    RRServo.attach(RRMotor);
+    LRServo.attach(LRMotor);
+
 }
 
 void loop() {
     //if (ibus.read()) {
         int throttle = ibus.readChannel(1);  // Channel 2 (Throttle)
         int steer = ibus.readChannel(3)-CENTER;  // Channel 4 (Steering)
+
+        if (throttle<1000 || throttle>2000) {throttle=CENTER;}
+        if (steer<-500 || steer>500) {steer=0;}
 
         // Convert iBus range (1000-2000) to RoboClaw motor range (500 to 2500)
         int motorSpeed = map(throttle, 1000, 2000, 500, 2500);
@@ -68,9 +78,11 @@ void loop() {
         }
 
         //Drive the motors using the servo objects
-        ServoA.writeMicroseconds(leftMotor);
-        ServoB.writeMicroseconds(rightMotor);
-*/
+        RFServo.writeMicroseconds(rightMotor);
+        LFServo.writeMicroseconds(leftMotor);
+        RRServo.writeMicroseconds(rightMotor);
+        LRServo.writeMicroseconds(leftMotor);
+
         // Debug Output
         Serial.print("Throttle: "); Serial.print(throttle);
         Serial.print(" | Steering: "); Serial.print(steer);
