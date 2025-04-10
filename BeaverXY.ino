@@ -38,9 +38,9 @@ int noDataCount = 0;
 #define RRMotor 23
 #define LRMotor 25
 
-#define HeadLight 20
-#define RunningLight 32
-#define Taillights 33
+#define Headlight 20
+#define Runninglight 32
+#define Taillight 33
 #define Beeper 35
 
 // Controller stick positions
@@ -106,10 +106,13 @@ void setup() {
   RRServo.attach(RRMotor);
   LRServo.attach(LRMotor);
   
-  pinMode(HeadLight, OUTPUT);
-  pinMode(RunningLight, OUTPUT);
-  pinMode(Taillights, OUTPUT);
-  pinMode(Beeper, OUTPUT);
+  pinMode(Headlight,OUTPUT);
+  pinMode(Runninglight,OUTPUT);
+  pinMode(Taillight,OUTPUT);
+  pinMode(Beeper,OUTPUT);
+
+  digitalWrite(Runninglight, HIGH);
+  digitalWrite(Taillight, HIGH);
   
   Serial.println("Initializing LIDAR...");
   startScan();
@@ -139,9 +142,9 @@ void loop() {
   }
   
   // Polar to XY
-  const float SLOW_DIST = 150; // Slow at about 40 inches (1000mm) (testing on desk with 150mm)
-  const float STOP_DIST = 60; // Stop at about 1ft (300mm) away (testing on desk with 60mm)
-  const float ROBOT_HALF_WIDTH = 150.0; // Assuming robot 34in (864mm) wide (testing on 350mm desk)
+  const float SLOW_DIST = 1000; // Slow at about 40 inches (1000mm) (testing on desk with 150mm)
+  const float STOP_DIST = 200; // Stop at about 1ft (300mm) away (testing on desk with 60mm)
+  const float ROBOT_HALF_WIDTH = 406.0; // Assuming robot 32in (813mm) wide (testing on 350mm desk)
   float effectiveFrontDist = 12000; 
   
   unsigned long now = millis(); // Current time for timestamp comparison
@@ -214,6 +217,10 @@ void loop() {
     right_motors(adjustedThrottle - steer_smoothed);
   }
   
+  if (throttle_smoothed < -THROTTLE_DEADZONE){digitalWrite(Beeper,HIGH);}
+
+  analogWrite(Headlight,headlights);
+
   delay(5);
 }
 
