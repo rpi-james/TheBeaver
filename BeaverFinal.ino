@@ -45,6 +45,7 @@ char rawdata[packet_length];           // Buffer to hold raw packet bytes
 float degreeDistances[360];            // Latest distance for each degree
 unsigned long degreeTimestamp[360];    // Timestamp to prevent stale readings
 int noDataCount = 0;                   // Counter for empty/failed packets
+bool lidarOFF = false;                 // var to control lights when lidar OFF
 
 // Motor, Lights, and IBus Definitions
 /***************************************************************************************************/
@@ -124,9 +125,14 @@ void setup() {
   }
 
   // LiDAR init
-  delay(2000); // Give lidar time to warm up (prevents lidar from not booting) 
+  //delay(2000); // Give lidar time to warm up (prevents lidar from not booting) 
   RPSERIAL.begin(RPLIDARBAUD, SERIAL_8N1, LIDAR_RX_PIN, LIDAR_TX_PIN);
-  startScan();
+  //startScan();
+
+  if (!startScan()) {
+    Serial.println("LiDAR failed to initialize on power-up.");
+    lidarOFF = true;
+  }
 
   // IBus & servos
   Serial2.begin(115200, SERIAL_8N1, IBUS_RX_PIN, -1);
@@ -141,7 +147,6 @@ void setup() {
   pinMode(Runninglight, OUTPUT);
   pinMode(Taillight, OUTPUT);
   pinMode(Beeper, OUTPUT);
-  digitalWrite(Runninglight, HIGH);   // adjusted later
   digitalWrite(Taillight, HIGH);
 
   // Initialize loop timing
@@ -152,8 +157,15 @@ void setup() {
 // Loop that repeats forever within the ESP after setup runs once
 /***************************************************************************************************/
 void loop() {
-  // unsigned long loopStart = micros(); //used for timing loop for freq
-  
+
+  if (lidarOFF) {
+    // Blink running lights when lidar off - DANGER MODE
+    unsigned long cycle1 = 2000;
+    unsigned long delta1 = millis() % cycle1;
+    if (delta1 < 1500) digitalWrite(Runninglight, HIGH);
+    else if (delta1 >= 1500) digitalWrite(Runninglight, LOW);
+  }
+
   // Map channels
   read_receiver(&ch1, &ch2, &ch3, &ch4,
                 &ch5, &ch6, &ch7, &ch8,
@@ -164,7 +176,6 @@ void loop() {
 
   steer = constrain(map(ch2, MIN, MAX, -110, 110), -100, 100);
 
-  //headlights = constrain(map(ch5, MIN, MAX, -10, 265), 0, 255); //PWM headlights
   bool headlightsOn = (ch5 > CENTER);
   digitalWrite(Headlight, headlightsOn ? HIGH : LOW);   //Headlights on/off
 
@@ -272,14 +283,6 @@ void loop() {
     Serial.print(" | Effective Front X: "); Serial.print(effectiveFrontDist);
     Serial.print(" mm | ScaleFactor: "); Serial.println(scaleFactor);
     //Serial.println(headlightsOn);
-
-    /* // freq test and timer
-    unsigned long loopEnd = micros();
-    
-    unsigned long loopTime = loopEnd - loopStart;
-    Serial.print("LOOP END — Time (µs): ");
-    Serial.println(loopTime);
-    */
   }
   #endif
 
@@ -302,7 +305,6 @@ void loop() {
     yield();                          
   }
   last_loop_time += loop_interval_us;
-  //last_loop_time = micros();
 
 }// end of loop()
 /***************************************************************************************************/
@@ -324,27 +326,25 @@ void endScan() {
   RPSERIAL.flush(); 
 }
 
+
 //start lidar scanner with start command
-void startScan() {
-  endScan(); 
-  RPSERIAL.flush(); // Clear serial buffers
-  delay(100);       // Time to reset - can likely be eliminated (or less)
-
-  RPSERIAL.write(startCmd, startCmd_length);
-  RPSERIAL.readBytes(response_buffer, response_length);
-
-  /*#ifdef DEBUG
-  if (RPSERIAL.readBytes(response_buffer, response_length) == response_length) {
-    if (arrayCmp(response_buffer, response, response_length)) 
-       Serial.println("LIDAR Initialized Successfully.");
-    else  
-      Serial.println("ERROR: Unexpected response from LIDAR.");
+bool startScan() {
+  for (int attempt = 0; attempt < 4; ++attempt) { // try startup 4 times
+    while (RPSERIAL.available()) RPSERIAL.read(); // drain old data
+    endScan(); 
+    RPSERIAL.flush();                             // Clear serial buffers
+    delay(50);                                    // Time to reset - can likely be eliminated (or less)
+    RPSERIAL.write(startCmd, startCmd_length);
+    if (RPSERIAL.readBytes(response_buffer, response_length) == response_length
+        && arrayCmp(response_buffer, response, response_length)) {
+      return true;  // lidar startup success
+    }
+    delay(100);
   }
-  else {
-    Serial.println("ERROR: No response from LIDAR.");
-  }
-  #endif*/
+  return false; // lidar failed to start
 }
+
+
 
 //Function to parse full raw data packets
 int parsePacket() {
