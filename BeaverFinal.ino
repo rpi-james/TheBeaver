@@ -125,10 +125,7 @@ void setup() {
   }
 
   // LiDAR init
-  //delay(2000); // Give lidar time to warm up (prevents lidar from not booting) 
   RPSERIAL.begin(RPLIDARBAUD, SERIAL_8N1, LIDAR_RX_PIN, LIDAR_TX_PIN);
-  //startScan();
-
   if (!startScan()) {
     Serial.println("LiDAR failed to initialize on power-up.");
     lidarOFF = true;
@@ -160,10 +157,7 @@ void loop() {
 
   if (lidarOFF) {
     // Blink running lights when lidar off - DANGER MODE
-    unsigned long cycle1 = 2000;
-    unsigned long delta1 = millis() % cycle1;
-    if (delta1 < 1500) digitalWrite(Runninglight, HIGH);
-    else if (delta1 >= 1500) digitalWrite(Runninglight, LOW);
+    blinkRunningLights();
   }
 
   // Map channels
@@ -241,10 +235,7 @@ void loop() {
   }
   else {
     // Blink running lights when lidar off - DANGER MODE
-    unsigned long cycle = 2000;
-    unsigned long delta = millis() % cycle;
-    if (delta < 1500) digitalWrite(Runninglight, HIGH);
-    else if (delta >= 1500) digitalWrite(Runninglight, LOW);
+    blinkRunningLights();
   }
 
   // LiDAR low pass filter averaging
@@ -436,4 +427,11 @@ void read_receiver(int *ch1, int *ch2, int *ch3, int *ch4,
   *ch5 = ibus.readChannel(4);
   *ch6 = ibus.readChannel(5);
   *ch7 = 0; *ch8 = 0; *ch9 = 0; *ch10 = 0; *ch11 = 0; *ch12 = 0;
+}
+
+void blinkRunningLights() {
+  unsigned long cycle1 = 2000;
+  unsigned long delta1 = millis() % cycle1;
+  if (delta1 < 1500) digitalWrite(Runninglight, HIGH);
+  else if (delta1 >= 1500) digitalWrite(Runninglight, LOW);
 }
