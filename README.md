@@ -2,7 +2,7 @@
 Senior Design Project — ESP32-Based 4WD Robot with Obstacle Avoidance
 
 # Overview
-TheBeaver is a four-motor skid-steer robot controlled via an RC transmitter (FlySky iBus) and powered by an ESP32. It integrates real-time LiDAR scanning using an RPLIDAR C1 for obstacle detection and autonomous slowdown. The project combines motor control, sensor fusion, and basic failsafe logic. It is complete with visual and audible indicators, utilizing always on running lights and taillights, controllable headlights, and a backup beeper.
+The Beaver is a four-motor skid-steer robot controlled via an RC transmitter (FlySky iBus) and powered by an ESP32. It integrates real-time LiDAR scanning using an RPLIDAR C1 for obstacle detection and autonomous slowdown. The project combines motor control, sensor fusion, and basic failsafe logic. It is complete with visual and audible indicators, utilizing always on running lights and taillights, controllable headlights, and a backup beeper.
 
 # Features
 - Throttle and steering input via FlySky iBus (Channels 2 and 4 - single stick control)
