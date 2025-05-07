@@ -15,7 +15,7 @@ The Beaver is a four-motor skid-steer robot controlled via an RC transmitter (Fl
 # Folder Structure
 - `Motor Code/` — RC input reading and PWM-based motor control iterations
 - `Lidar Code/` — ESP32-based LiDAR packet reader and distance mapping iterations
-- `Integrated Robot/` — Combined system with obstacle avoidance, lights, and control logic iterations
+- `Integrated Robot Code/` — Combined system with obstacle avoidance, lights, and control logic iterations
 - `TheBeaverFinal/` — Final combined system with obstacle avoidance, lights, and control logic for deployable prototype
 
 # Hardware
