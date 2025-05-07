@@ -1,30 +1,50 @@
-/***************************************************************************************************
-  File: BeaverFinal.ino
-  Description: Final main control firmware for a 4-motor, ESP32-based obstacle-avoiding robot.
-               - Reads FlySky iBus receiver channels for throttle, steering, and headlight and lidar toggle control
-                   - Includes deadzones and invalid data clipping
-               - Drives four motors with ESP32Servo, mapping throttle/steer to differential PWM.
-               - Interfaces with RPLIDAR over Serial1:
-                   - Sends start/stop scan commands and validates packet sync headers.
-                   - Parses 84-byte data packets into 40 angle-distance samples per scan.
-                   - Places readings into 360° arrays with timestamp-based staleness filtering.
-               - Precomputes sin/cos lookup tables for fast polar-to-Cartesian conversions.
-               - Implements dynamic slowdown:
-                   - Scans front wedges (275°–359° and 0°–85°) within robot width which compensates for all hardware.
-                   - Applies low-pass filter to effective distance and computes speed scale factor.
-               - Applies first-order low-pass filters to user throttle and steering inputs.
-               - Controls headlights, running lights, taillight, and beeper based on mode and input.
-               - Enforces consistent main-loop frequency (250 Hz) with yield-based timing.
-               - Outputs debug every 5 loops when DEBUG is defined.
-               - Provides failsafe blink mode when LiDAR initialization fails or is disabled.
+/*******************************************************************************************************
+  File: Final_LiDAR_MotorControl.ino
+  Description: 
+      ESP32-based skid‑steer motor control using microsecond‑pulse servo outputs. Integrated LiDAR
+      obstacle detection with lighting and audio feedback
+          - Reads Flysky IBus channels for throttle, steering, lights, and LiDAR enable.
+          - Applies a center deadzone, and maps inputs to four ESP32Servo channels
+              - Forward, reverse and turning maneuvars 
+          - Smooths RC inputs with exponential low pass filters (α=0.9).             
+          - Initializes RPLIDAR on Serial1 (RX GPIO18, TX GPIO19)
+              - 460800 baud and parses 360° scan packets.
+          - Precomputes sine/cosine lookup tables for fast polar→Cartesian conversion.
+          - Discards stale readings older than 100 ms (DATA_TIMEOUT).
+          - Dynamically scales throttle
+          - Controls running light, taillight, and beeper output.
+         **New in v1.2.0:**
+          - Added configurable 250Hz MAIN_LOOP_FREQ based timing with watchdog safe yield() delays.
+          - Implemented LiDAR startScan() retry logic (4 attempts).
+          - Introduced smoothstep function for smoother slowdown curves.
+          - Added separate low-pass smoothing for LiDAR distance averaging and scale factor.
+          - BlinkRunningLights() for LiDAR failure and OFF indicator.
+          - Updated SLOW_DIST=1000 mm and STOP_DIST=500 mm thresholds.
+          - Conditional DEBUG macro to enable/disable.
+          - Added headlight control and function on channel 5
+          
   Author: 2025 Senior Design II ECE team
   Updated by: Nicholas Matter
-  Last Modified: 03 May 2025
+  Last Modified: 2 May 2025
+
+  Version:
+      1.2.0
+    
   Dependencies:
-    • IBusBM.h        (FlySky iBus protocol)
-    • ESP32Servo.h    (ESP32 Servo support)
-    • math.h          (Trigonometric functions, fmod)
-/***************************************************************************************************/
+    - IBusBM.h        FlySky iBus protocol
+    - ESP32Servo.h    Servo control library for ESP32 (us precision) 
+    - math.h          For sin(), cos() lookup tables 
+    
+  Hardware:  
+    - Flysky IBus RX on GPIO16 (Serial2 RX), TX not used  
+    - Servo/ESC inputs on GPIO2 (RF), GPIO4 (LF), GPIO23 (RR), GPIO25 (LR)  
+    - RPLIDAR C1 on Serial1 (RX GPIO18, TX GPIO19)
+    - Headlight: GPIO26 (digital)
+    - Running light: GPIO32 (digital) 
+    - Taillight: GPIO33 (digital)
+    - Beeper: GPIO27 (digital)  
+/*******************************************************************************************************/
+
 
 // Include libraries
 #include <IBusBM.h>         // FlySky IBus protocol library
