@@ -21,7 +21,7 @@ Combined motor control and obstacle‐detection prototype for four‑motor skid�
     - Enable/disable via RC channel.
     - Precomputed sine/cosine lookup tables for fast polar to Cartesian transforms.
     - `DATA_TIMEOUT` and `noDataCount` logic: auto‑flush on errors.
-    - Dynamic throttle scaling based on `SLOW_DIST` (200 mm) & `STOP_DIST` (50 mm).
+    - Dynamic throttle scaling based on `SLOW_DIST` (200 mm) & `STOP_DIST` (50 mm) (test distances).
     - Configurable `ROBOT_HALF_WIDTH` for detection sizing.
   - Refactored into helper functions:
     - `startScan()`, `endScan()`, `Scanner()`, `left_motors()`, `right_motors()`, `read_receiver()`.
