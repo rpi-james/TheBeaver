@@ -26,7 +26,7 @@ The Beaver is a four-motor skid-steer robot controlled via an RC transmitter (Fl
 - Optional: LEDs, beeper, headlight control
 
 # Setup
-No external libraries needed. Flash the code directly to ESP32 using Arduino IDE or PlatformIO. Use standard wiring conventions and ensure 5V LiDAR is correctly powered.
+No external libraries needed. Flash the code directly to ESP32 using Arduino IDE or PlatformIO. Use standard wiring conventions and ensure 5V LiDAR, ESP32, and FlySky receiver is correctly powered.
 
 # Usage
 - Power on robot
