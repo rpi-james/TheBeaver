@@ -1,3 +1,30 @@
+/***************************************************************************************************
+  File: BasicMotorControl_RoboClaw.ino
+  Description: 
+      ESP32-based skid‑steer motor control for a Flysky RC transmitter using RoboClaw motor controllers. 
+          - Reads throttle (channel 2) and steering (channel 4) via Flysky IBus receiver
+          - Maps the 1000–2000 us range to –127 to +127 speed values
+          - Issues Forward/Backward commands to M1 and M2 on the RoboClaw.
+  Author: 2025 Senior Design II ECE team
+  Updated by: Nicholas Matter
+  Last Modified: 10 Febrary 2025
+
+  Version:
+      1.0.0 — Initial release
+    
+  Dependencies:
+    - IBusBM.h        FlySky iBus protocol
+    - RoboClaw.h      RoboClaw Serial motor controller library  
+    
+  Hardware:  
+    – Flysky IBus RX on GPIO16 (Serial2 RX), TX not used  
+    – RoboClaw on Serial1 (TX GPIO4, RX GPIO2), address 128
+    
+  Notes:
+    - No change log entries yet. This is the first iteration.  
+    - For future updates and detailed history, see changelog
+/***************************************************************************************************/
+
 #include <IBusBM.h>
 #include "RoboClaw.h"
 
