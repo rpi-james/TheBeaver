@@ -2,7 +2,7 @@
 
 All notable changes to this LiDAR packet parser for RPLIDAR C1 are documented here.
 
-## [0.3.0] – 2025‑MM‑DD
+## [0.3.0] – April 2025
 ### Added
 - Switched from per‑packet output to full‑circle array output.
 - Rounded angles to integer degrees for consistent indexing.
@@ -10,7 +10,7 @@ All notable changes to this LiDAR packet parser for RPLIDAR C1 are documented he
 - Smoothed delta‑angle calculation using `lastAngle` to improve scan accuracy.
 - Improved packet sync verification.
 
-## [0.2.0] – 2025‑MM‑DD
+## [0.2.0] – March 2025
 ### Changed
 - Introduced `degreeDistances[360]` array for per‑degree storage.
 - Populated global distance map in `loop()` using 40 measurements per packet.
@@ -18,7 +18,7 @@ All notable changes to this LiDAR packet parser for RPLIDAR C1 are documented he
 - Initialized `degreeDistances` to zero in `setup()`.
 - Enhanced debug loop to sequentially print all valid degree entries.
 
-## [0.1.0] – 2025‑MM‑DD
+## [0.1.0] – March 2025
 ### Added
 - Initial LiDAR parsing release.
   - Initializes `Serial1` at 460800 baud to communicate with LiDAR.
