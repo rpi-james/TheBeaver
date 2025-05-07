@@ -1,3 +1,60 @@
+/*******************************************************************************************************
+  File: LiDAR_MotorIntegration.ino
+  Description: 
+      ESP32-based skid‑steer motor control using microsecond‑pulse servo outputs. Integrated LiDAR
+      obstacle detection with basic lighting and audio feedback
+          - Reads Flysky IBus channels for throttle, steering, lights, and LiDAR enable.
+          - Applies a center deadzone, and maps inputs to four ESP32Servo channels
+              - Forward, reverse and turning maneuvars 
+          - Smooths RC inputs with exponential low pass filters (α=0.9).             
+          - Initializes RPLIDAR on Serial1 (RX GPIO18, TX GPIO19)
+              - 460800 baud and parses 360° scan packets.
+          - Precomputes sine/cosine lookup tables for fast polar→Cartesian conversion.
+          - Discards stale readings older than 100 ms (DATA_TIMEOUT).
+          - Dynamically scales throttle
+          - Controls headlight, running light, taillight, and beeper output.
+          
+  Author: 2025 Senior Design II ECE team
+  Updated by: Nicholas Matter
+  Last Modified: 20 March 2025
+
+  Version:
+      1.1.0
+    
+  Dependencies:
+    - IBusBM.h        FlySky iBus protocol
+    - ESP32Servo.h    Servo control library for ESP32 (us precision) 
+    - math.h          For sin(), cos() lookup tables 
+    
+  Hardware:  
+    - Flysky IBus RX on GPIO16 (Serial2 RX), TX not used  
+    - Servo/ESC inputs on GPIO2 (RF), GPIO4 (LF), GPIO23 (RR), GPIO25 (LR)  
+    - RPLIDAR C1 on Serial1 (RX GPIO18, TX GPIO19)
+    - Headlight: GPIO20 (PWM)
+    - Running light: GPIO32 (digital) 
+    - Taillight: GPIO33 (digital)
+    - Beeper: GPIO35 (digital)  
+    
+  Changes:
+     v1.1.0 (2025‑03‑20)
+       - Added smoothing filters for RC inputs  
+       - Integrated lighting and beeper control
+       - Added LiDAR obstacle avoidance functionality
+         - LiDAR enable/disable via RC channel 
+         - Precomputed sine/cosine lookup tables for fast polar→Cartesian transforms  
+         - Implemented DATA_TIMEOUT and noDataCount logic 
+             - automatically flushes LiDAR buffer on errors  
+         - Dynamic throttle scaling:
+             - Based on SLOW_DIST (200 mm) and STOP_DIST (50 mm) thresholds 
+             - Configurable robot half‑width constant (ROBOT_HALF_WIDTH) for detection sizing 
+             - small testing values must be changed
+         - Exponential smoothing filters (α=0.9) on throttle and steering inputs  
+         - Refactored core routines into helper functions: 
+             - startScan, endScan, Scanner, left_motors, right_motors, read_receiver  
+         - Enhanced debug every five loops: 
+             - raw vs. adjusted throttle, steering, effectiveFrontDist, scaleFactor   
+/*******************************************************************************************************/
+
 #include <IBusBM.h>
 #include <ESP32Servo.h>
 #include <math.h>
