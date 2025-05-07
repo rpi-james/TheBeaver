@@ -20,5 +20,5 @@ Tracks changes to the ESP32-based skid‑steer motor control using a FlySky RC t
 ### Added
 - Initial skid‑steer motor control implementation.
   - Reads throttle (ch 2) and steering (ch 4) via FlySky IBus.
-  - Maps 1000–2000 µs range to –127…+127 speed.
+  - Maps 1000–2000 µs range to –127 to +127 speed.
   - Issues Fwd/Back commands to M1/M2 on the RoboClaw.
