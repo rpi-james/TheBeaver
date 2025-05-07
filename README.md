@@ -38,5 +38,5 @@ No external libraries needed. Flash the code directly to ESP32 using Arduino IDE
 # Notes
 - See each folder’s `CHANGELOG.md` for version history
 - Code is structured for readability and modularity
-- Avoid running LiDAR without open space to test detection
+- Avoid running LiDAR without open space initially to test detection
 
