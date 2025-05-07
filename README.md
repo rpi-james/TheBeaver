@@ -33,7 +33,7 @@ No external libraries needed. Flash the code directly to ESP32 using Arduino IDE
 - Use transmitter to drive (throttle = Ch2, steering = Ch4) - right stick only
 - LiDAR scans autonomously; robot slows/stops based on obstacles
 - Channel 5 toggles headlights - left dial
-- Channel 6 toggles LiDAR - right dial
+- Channel 6 toggles LiDAR - right dial (running lights will blink when off or if LiDAR failed to startup)
 
 # Notes
 - See each folder’s `CHANGELOG.md` for version history
