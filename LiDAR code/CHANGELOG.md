@@ -6,7 +6,7 @@ All notable changes to this LiDAR packet parser for RPLIDAR C1 are documented he
 ### Added
 - Switched from per‑packet output to full‑circle array output.
 - Rounded angles to integer degrees for consistent indexing.
-- Coordinate transformation (polar → XY) for spatial mapping.
+- Coordinate transformation (polar to XY) for spatial mapping.
 - Smoothed delta‑angle calculation using `lastAngle` to improve scan accuracy.
 - Improved packet sync verification.
 
