@@ -1,3 +1,33 @@
+/*******************************************************************************************************
+  File: MotorDriving_RCPulse.ino
+  Description: 
+      ESP32-based skid‑steer motor control using  microsecond‑pulse servo outputs. 
+          - Reads throttle (channel 2) and steering (channel 4) via Flysky IBus receiver
+          - Applies a center deadzone, and maps inputs to four ESP32Servo channels
+              - Forward, reverse and turning maneuvars 
+          
+  Author: 2025 Senior Design II ECE team
+  Updated by: Tyler James
+  Last Modified: 13 Febrary 2025
+
+  Version:
+      1.0.1
+    
+  Dependencies:
+    - IBusBM.h        FlySky iBus protocol
+    - ESP32Servo.h    Servo control library for ESP32 (us precision) 
+    
+  Hardware:  
+    – Flysky IBus RX on GPIO16 (Serial2 RX), TX not used  
+    – Servo/ESC inputs on GPIO2 (RF), GPIO4 (LF), GPIO23 (RR), GPIO25 (LR)  
+    
+  Changelog:
+    v1.0.1 (2025‑02‑13)
+      - Replaced RoboClaw commands with direct PWM via ESP32Servo  
+      - Added DEADZONE handling around center for throttle & steering  
+      - Refined differential steering logic for smoother turns  
+/*******************************************************************************************************/
+
 #include <IBusBM.h>
 #include <ESP32Servo.h>
 
