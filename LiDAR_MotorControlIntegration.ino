@@ -12,7 +12,7 @@
           - Precomputes sine/cosine lookup tables for fast polar→Cartesian conversion.
           - Discards stale readings older than 100 ms (DATA_TIMEOUT).
           - Dynamically scales throttle
-          - Controls headlight, running light, taillight, and beeper output.
+          - Controls  running light, taillight, and beeper output.
           
   Author: 2025 Senior Design II ECE team
   Updated by: Nicholas Matter
@@ -30,7 +30,6 @@
     - Flysky IBus RX on GPIO16 (Serial2 RX), TX not used  
     - Servo/ESC inputs on GPIO2 (RF), GPIO4 (LF), GPIO23 (RR), GPIO25 (LR)  
     - RPLIDAR C1 on Serial1 (RX GPIO18, TX GPIO19)
-    - Headlight: GPIO20 (PWM)
     - Running light: GPIO32 (digital) 
     - Taillight: GPIO33 (digital)
     - Beeper: GPIO35 (digital)  
@@ -95,7 +94,6 @@ int noDataCount = 0;
 #define RRMotor 23
 #define LRMotor 25
 
-#define Headlight 20
 #define Runninglight 32
 #define Taillight 33
 #define Beeper 35
@@ -109,7 +107,6 @@ int noDataCount = 0;
 
 int throttle;
 int steer;
-int headlights;
 
 int throttle_smoothed = 0;
 int steer_smoothed = 0;
@@ -163,7 +160,6 @@ void setup() {
   RRServo.attach(RRMotor);
   LRServo.attach(LRMotor);
   
-  pinMode(Headlight,OUTPUT);
   pinMode(Runninglight,OUTPUT);
   pinMode(Taillight,OUTPUT);
   pinMode(Beeper,OUTPUT);
@@ -238,7 +234,6 @@ void loop() {
   read_receiver(&ch1, &ch2, &ch3, &ch4, &ch5, &ch6, &ch7, &ch8, &ch9, &ch10, &ch11, &ch12);
   throttle = constrain(map(ch1, MIN, MAX, -110, 110), -100, 100);
   steer = constrain(map(ch2, MIN, MAX, 110, -110), -100, 100);
-  headlights = constrain(map(ch5, MIN, MAX, -10, 110), 0, 100);
   
   // Exponential smoothing for throttle and steering
   throttle_smoothed = (throttle_smoothed * throttle_alpha) + (throttle * (1 - throttle_alpha));
@@ -275,8 +270,6 @@ void loop() {
   }
   
   if (throttle_smoothed < -THROTTLE_DEADZONE){digitalWrite(Beeper,HIGH);}
-
-  analogWrite(Headlight,headlights);
 
   delay(5);
 }
