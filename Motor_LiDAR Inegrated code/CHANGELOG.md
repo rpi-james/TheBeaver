@@ -19,7 +19,7 @@ Combined motor control and obstacle‐detection prototype for four‑motor skid�
   - Lighting & beeper control.
   - LiDAR obstacle avoidance:
     - Enable/disable via RC channel.
-    - Precomputed sine/cosine lookup tables for fast polar→Cartesian transforms.
+    - Precomputed sine/cosine lookup tables for fast polar to Cartesian transforms.
     - `DATA_TIMEOUT` and `noDataCount` logic: auto‑flush on errors.
     - Dynamic throttle scaling based on `SLOW_DIST` (200 mm) & `STOP_DIST` (50 mm).
     - Configurable `ROBOT_HALF_WIDTH` for detection sizing.
