@@ -28,6 +28,23 @@ The Beaver is a four-motor skid-steer robot controlled via an RC transmitter (Fl
 # Setup
 No external libraries needed. Flash the code directly to ESP32 using Arduino IDE or PlatformIO. Use standard wiring conventions and ensure 5V LiDAR, ESP32, and FlySky receiver is correctly powered.
 
+## Pinout (ESP32 Dev Board)
+| Component                         | ESP32 Pin |
+|-----------------------------------|-----------|
+| Front Left motor ESC PWM          | GPIO 4    |
+| Rear Left motor ESC PWM           | GPIO 25   |
+| Front Right motor ESC PWM         | GPIO 2    |
+| Rear Right motor ESC PWM          | GPIO 23   |
+| FlySky iBus RX (UART2 RX)         | GPIO 16   |
+| RPLIDAR C1 - ESP32 RX1 (Serial1)  | GPIO 18   |
+| RPLIDAR C1 - ESP32 TX1 (Serial1)  | GPIO 19   |
+| Headlight control (Channel 5)     | GPIO 26   |
+| Running Lights                    | GPIO 32   |
+| Taillights                        | GPIO 33   |
+| Beeper                            | GPIO 27   |
+
+Ensure all grounds are common and the 5 V supply is stable.
+
 # Usage
 - Power on robot
 - Use transmitter to drive (throttle = Ch2, steering = Ch4) - right stick only
